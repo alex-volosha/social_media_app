@@ -1,0 +1,22 @@
+select COUNT(sessionId) Sessions,
+COUNT(DISTINCT userId) Users,
+ROUND(Sessions/Users,1) AS Session_per_user,
+toDate(date) Days
+FROM memasik.Sessions
+WHERE eventType = 'started'
+AND language = 'en'
+GROUP BY toDate(date)
+ORDER BY toDate(date) DESC
+
+-- Most active users by count of Sessions
+
+SELECT COUNT(sessionId) Sessions,
+userId,
+toDate(date) Days
+FROM memasik.Sessions
+WHERE eventType = 'started'
+AND language = 'en'
+AND Days > '2022-08-15'
+GROUP BY userId,toDate(date)
+HAVING COUNT(sessionId) > '10'
+ORDER BY Days,Sessions DESC
