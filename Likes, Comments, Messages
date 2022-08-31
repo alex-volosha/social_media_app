@@ -1,0 +1,14 @@
+-- By addint distinct to a.id we calculate users not events
+SELECT COUNT("Accounts".id) AS likes, 
+			  DATE_TRUNC('month',"Votes"."updatedAt")::Date AS months,
+			  a.language,a.country
+FROM "Accounts" AS a
+LEFT JOIN "Votes" AS v
+ON a.id = v.account_id
+-- By filtering by comment_id is not null we calculate comments
+WHERE v.post_id is not null
+  AND a.language in('en','es','pt','pl','ru') 
+  AND a.country in('US','GB','CA','AU','MX','BR','PL','RU')
+  GROUP BY months,a.language,a.country
+HAVING COUNT( a.id) >100
+ORDER BY months DESC
