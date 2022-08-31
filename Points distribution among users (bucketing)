@@ -1,0 +1,13 @@
+SELECT COUNT(*), country, language,
+	DATE_TRUNC('week', "updatedAt")::DATE as date,
+	CASE 
+     WHEN cash > 0 AND cash <=100 THEN 'Less than 100'
+     WHEN cash > 100 and cash <=1000 THEN 'More than 100 and less than 1000'
+	 WHEN cash > 1000 THEN 'Millionaires'
+	 END AS points_ammount
+	FROM "Accounts"
+		WHERE DATE_TRUNC('week', "updatedAt")::DATE >='2021-01-01'
+		AND country IN('US','GB') AND CAST(cash AS int) > 0
+		AND language IN ('en')
+	GROUP BY country,language,points_ammount, DATE_TRUNC('week', "updatedAt")::DATE
+	ORDER BY DATE_TRUNC('week', "updatedAt")::DATE DESC
