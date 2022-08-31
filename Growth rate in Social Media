@@ -1,6 +1,6 @@
 WITH VOTES AS
 (SELECT COUNT(DISTINCT a.id) as voters, 
-			  DATE_TRUCNT('month',v."updatedAt")::Date AS months
+			  DATE_TRUNT('month',v."updatedAt")::Date AS months
 FROM "Accounts" AS a
 LEFT JOIN "Votes" AS v
 ON a.id = v.account_id
