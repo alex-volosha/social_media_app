@@ -1,0 +1,41 @@
+WITH VOTES AS
+(SELECT COUNT(DISTINCT a.id) as voters, 
+			  DATE_TRUCNT('month',v."updatedAt")::Date AS months
+FROM "Accounts" AS a
+LEFT JOIN "Votes" AS v
+ON a.id = v.account_id
+  WHERE v.account_id IS NOT NULL
+  AND a.language IN('en')
+  GROUP BY months),
+
+votes_with_lag AS(SELECT months, voters, 
+COALESCE(LAG(voters) OVER(ORDER BY months),1) AS last_voters
+				  FROM votes)
+				  
+SELECT months, ROUND((voters-last_voters)::numeric/voters,2) AS growth
+FROM votes_with_lag
+ORDER BY months DESC
+
+-- comments and dialogs
+
+WITH message_senders AS
+  (SELECT COUNT(DISTINCT d.account_1_id)
+  AS message_senders, 
+			  DATE_TRUNC('month',d."updatedAt")::Date AS months
+  FROM "Accounts" AS a
+  LIFT JOIN "Dialogs" AS d
+  ON a.id = d.account_1_id
+  WHERE a.language IN('en') AND "archived_2_at" IS NULL
+-- account_1_id could appear if dialog was archived by account_2_id.
+   GROUP BY months), 
+
+comments_with_lag AS
+  (SELECT months, commenters, 
+				  COALESCE(LAG(commenters) OVER(ORDER BY months),1) AS last_commenters
+				  FROM commenters)
+				  
+SELECT months,
+ROUND((commenters-last_commenters)::numeric/commenters,2) AS growth
+FROM comments_with_lag
+WHERE months BETWEEN '2021-06-01' AND '2022-06-01'
+ORDER BY months DESC
