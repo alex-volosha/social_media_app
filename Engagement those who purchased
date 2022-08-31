@@ -1,0 +1,38 @@
+--Query for Purchase users
+SELECT * FROM "GooglePlayPurchases"
+WHERE "kind" = 'androidpublisher#productPurchase'
+ORDER BY 5 DESC
+
+-- Count of followers added during the month for those who purchased coins
+SELECT subscription_account_id, 
+COUNT(subscriber_account_id) AS followers
+  FROM "AccountSubscriptions" AS as
+  LEFT JOIN "GooglePlayPurchases" AS gp
+  ON gp.account_id = as.subscription_account_id
+  WHERE gp.kind = 'androidpublisher#productPurchase' 
+    AND EXTRACT('month' FROM gp."updatedAt")=6
+    AND EXTRACT('year' FROM gp."updatedAt")=2022
+    GROUP BY subscription_account_id
+    ORDER BY followers DESC
+    
+    
+
+--Median amount of comments made by user per month
+WITH cte AS( 
+  SELECT account_id, 
+  COUNT(id) AS comments 
+	FROM "Comments"
+  GROUP BY account_id),
+    cte2 AS 
+      (SELECT DISTINCT account_id, 
+       DATE_TRUNC('month',"createdAt")::Date AS months 
+		    FROM "Comments")
+SELECT cte2.months,
+PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY comments) AS median 
+  FROM cte
+  LEFT JOIN cte2
+  ON cte.account_id = cte2.account_id
+  GROUP BY cte2.months
+  ORDER BY months DESC
+
+
