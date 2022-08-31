@@ -1,0 +1,10 @@
+SELECT  toDate(date) days, COUNT(DISTINCT userId) users
+FROM memasik.UserActioned ua
+LEFT JOIN memasik_postgres.Accounts a
+ON toInt32(ua.userId) = a.id
+WHERE actionType = 'view'
+AND objectType = 'post'
+AND a.language = 'en'
+AND days > '2022-08-16'
+GROUP BY toDate(date)
+ORDER BY toDate(date) DESC
