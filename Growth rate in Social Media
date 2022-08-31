@@ -1,4 +1,4 @@
-WITH VOTES AS
+WITH votes AS
 (SELECT COUNT(DISTINCT a.id) as voters, 
 			  DATE_TRUNT('month',v."updatedAt")::Date AS months
 FROM "Accounts" AS a
@@ -23,7 +23,7 @@ WITH message_senders AS
   AS message_senders, 
 			  DATE_TRUNC('month',d."updatedAt")::Date AS months
   FROM "Accounts" AS a
-  LIFT JOIN "Dialogs" AS d
+  LEFT JOIN "Dialogs" AS d
   ON a.id = d.account_1_id
   WHERE a.language IN('en') AND "archived_2_at" IS NULL
 -- account_1_id could appear if dialog was archived by account_2_id.
